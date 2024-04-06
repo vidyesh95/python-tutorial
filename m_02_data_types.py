@@ -33,7 +33,7 @@ print(float_num, "is of type", type(float_num))
 real = 5
 imaginary = 3
 complex_num = complex(real, imaginary)
-print("Complex number is",complex_num,'of type',type(complex_num))
+print("Complex number is", complex_num, 'of type', type(complex_num))
 
 # Sequence types
 # list
@@ -94,6 +94,7 @@ can be used to make random numbers:
 """
 # Example
 import random
+
 print(random.randrange(1, 10))
 
 # Casting
