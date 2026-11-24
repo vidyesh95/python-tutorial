@@ -6,7 +6,9 @@ Tasks
 2. create_access_token(subject, secret, expires_delta=30 min, now=None): HS256 JWT with
    claims "sub", "iat" and "exp" (now + expires_delta). `now` defaults to datetime.now(UTC).
 3. decode_token(token, secret): return the "sub" claim. Raise AuthError for ANY problem:
-   expired, bad signature, malformed, or no string "sub". Pin the algorithm (HS256) when decoding.
+   expired, bad signature, malformed, or no string "sub". Pin the algorithm (HS256) when decoding,
+   and REQUIRE the "exp", "iat" and "sub" claims (PyJWT only checks `exp` if it is present, so a
+   token without it would otherwise be accepted forever): `options={"require": [...]}`.
 4. authenticate(users, username, password): return the user dict if the username exists and the
    password matches its "password_hash"; otherwise None.
 5. get_current_user: the FastAPI dependency behind GET /users/me. Decode the bearer token with

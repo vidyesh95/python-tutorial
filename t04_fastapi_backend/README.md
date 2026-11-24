@@ -44,10 +44,11 @@ real Redis (`REDIS_URL=redis://localhost:6379/0`).
 | 17 | `m_17_observability_opentelemetry`    | JSON logs, request ids, traces/spans, metrics, health/readiness        | ✅ |
 | 18 | `m_18_dockerizing_fastapi`            | multi-stage uv Dockerfile, non-root, healthcheck, compose              | ✅ |
 | 19 | `m_19_settings_and_secrets`           | pydantic-settings, `.env`, `SecretStr`, per-environment config         | ✅ |
+| 20 | `m_20_auth_schema_sessions`           | Better Auth-style schema, DB sessions, JWT refresh rotation, OAuth link | ✅ |
 
 Each lesson has a matching exercise `exercises/ex_NN_*.py` (stubs that raise
 `NotImplementedError`), a reference implementation `solutions/ex_NN_*.py`, and tests in
-`tests/test_ex_NN_*.py`. Lessons 18 also ships `docker/Dockerfile` and `docker/compose.yaml`
+`tests/test_ex_NN_*.py`. Lesson 18 also ships `docker/Dockerfile` and `docker/compose.yaml`
 (the Postgres lesson adds `docker/compose.postgres.yaml`).
 
 ## How to work
@@ -114,6 +115,7 @@ uv run ruff check t04_fastapi_backend && uv run ruff format t04_fastapi_backend
 - [ ] 17 Observability with OpenTelemetry: lesson read, exercise passing
 - [ ] 18 Dockerizing FastAPI: lesson read, exercise passing
 - [ ] 19 Settings and secrets: lesson read, exercise passing
+- [ ] 20 Auth schema, sessions and token rotation: lesson read, exercise passing
 - [ ] Capstone below finished, tested, and containerized
 - [ ] `uv run ruff check t04_fastapi_backend` is clean
 
@@ -128,6 +130,10 @@ to deploy.
 1. **Users and auth**: register and log in; passwords hashed with `pwdlib` (argon2); OAuth2
    password flow issuing short-lived JWT access tokens; a `get_current_user` dependency;
    every project/task route requires a valid token. Users can only see their own data.
+   Use the schema from `m_20_auth_schema_sessions` (`user`, `session`, `account`,
+   `verification`, plus `refresh_token`) as the recommended auth model: Argon2id password
+   hashes on the credential `account`, only SHA-256 hashes of session/refresh/verification
+   tokens in the database, and rotating refresh tokens with reuse detection.
 2. **Projects and tasks (CRUD)**: a user owns many projects; a project has many tasks with
    `title`, `description`, `status` (`todo`/`doing`/`done`), `due_date`, `priority`. Full
    create/read/update/delete with correct status codes (201, 204, 404, 409, 422).

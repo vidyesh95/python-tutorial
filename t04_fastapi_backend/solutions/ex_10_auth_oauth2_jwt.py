@@ -39,7 +39,12 @@ def create_access_token(
 
 def decode_token(token: str, secret: str) -> str:
     try:
-        payload = jwt.decode(token, secret, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token,
+            secret,
+            algorithms=[ALGORITHM],  # pin exactly one algorithm
+            options={"require": ["exp", "iat", "sub"]},  # a token without `exp` never expires
+        )
     except jwt.InvalidTokenError as exc:
         raise AuthError(str(exc)) from exc
     subject = payload.get("sub")

@@ -4,6 +4,10 @@ Authentication = "who are you?". The standard FastAPI recipe:
 
 1. Register: store a password HASH (never the password). `pwdlib` + Argon2 is the modern
    choice: slow on purpose, salted, parameters embedded in the hash string.
+   `PasswordHash.recommended()` is Argon2**id** (hashes start with `$argon2id$v=19$`) with
+   pwdlib's default params m=65536 KiB (64 MiB), t=3 iterations, p=4 lanes. Argon2id is the
+   hybrid variant: it resists side-channel attacks (like Argon2i) AND GPU cracking (like
+   Argon2d), which is why OWASP lists it as the first choice for password storage.
 2. Login: client POSTs `username` + `password` (form fields) to `/token`. We verify the hash
    and return a signed JWT: {"access_token": "...", "token_type": "bearer"}.
 3. Calls: client sends `Authorization: Bearer <jwt>`. A dependency (`get_current_user`)
@@ -20,13 +24,16 @@ FastAPI pieces:
   fastapi[standard]).
 - 401 responses should carry `WWW-Authenticate: Bearer`.
 
-Secret handling: `SECRET_KEY` comes from the environment. A dev default exists so the lesson
-runs, but it triggers a warning - never ship the default.
+Secret handling: `SECRET_KEY` comes from the environment and is read by `get_secret()` when a
+token is signed or verified. A missing key is a RuntimeError, unless you opt in to the insecure
+development key with `APP_ENV=dev` (or `test`) - there is no silent fallback to a key that is
+committed to the repo.
 Generate a real one:  python -c "import secrets; print(secrets.token_urlsafe(48))"
 
-Serve it live:  uv run fastapi dev t04_fastapi_backend/m_10_auth_oauth2_jwt.py
+Serve it live:  APP_ENV=dev uv run fastapi dev t04_fastapi_backend/m_10_auth_oauth2_jwt.py
                 (open /docs, click Authorize, log in as ada / correct-horse-battery)
 Run the offline demo: uv run python -m t04_fastapi_backend.m_10_auth_oauth2_jwt
+                (the demo sets APP_ENV=dev itself and says so)
 """
 
 import os
@@ -41,15 +48,26 @@ from fastapi.testclient import TestClient
 from pwdlib import PasswordHash
 from pydantic import BaseModel
 
-# Example: configuration from the environment (with a loud dev default)
+# Example: configuration from the environment (the dev key is opt-in, never the default)
 DEV_SECRET = "dev-only-secret-change-me-0123456789abcdef"
-SECRET_KEY = os.environ.get("SECRET_KEY", DEV_SECRET)
-if SECRET_KEY == DEV_SECRET:
-    warnings.warn("SECRET_KEY not set: using the insecure development default!", stacklevel=1)
+
+
+def get_secret() -> str:
+    """The signing key, resolved lazily (on first sign/verify) so a misconfigured deployment
+    fails loudly instead of silently signing with a key that is public in this repository."""
+    secret = os.environ.get("SECRET_KEY")
+    if secret:
+        return secret
+    if os.environ.get("APP_ENV") in {"dev", "test"}:
+        warnings.warn("SECRET_KEY not set: using the INSECURE development key", stacklevel=2)
+        return DEV_SECRET
+    raise RuntimeError("SECRET_KEY is not set (set it, or APP_ENV=dev for local lessons only)")
+
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_MINUTES = 30
 
-# Example: password hashing (Argon2 by default)
+# Example: password hashing (Argon2id by default: v=19, m=65536 KiB, t=3, p=4)
 password_hash = PasswordHash.recommended()
 DB: dict[str, dict[str, str]] = {
     "ada": {
@@ -70,12 +88,19 @@ def create_access_token(subject: str, expires: timedelta | None = None) -> str:
         "iat": now,
         "exp": now + (expires or timedelta(minutes=ACCESS_TOKEN_MINUTES)),
     }
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(payload, get_secret(), algorithm=ALGORITHM)
 
 
 def decode_token(token: str) -> str:
     """Return the subject or raise jwt.InvalidTokenError (expired, tampered, malformed...)."""
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # pin the algorithm!
+    payload = jwt.decode(
+        token,
+        get_secret(),
+        algorithms=[ALGORITHM],  # pin the algorithm!
+        # Without `require`, PyJWT validates exp only IF present: a token with no `exp` at all
+        # (signed by us, or by a bug elsewhere) would be accepted forever.
+        options={"require": ["exp", "iat", "sub"]},
+    )
     subject = payload.get("sub")
     if not isinstance(subject, str):
         raise jwt.InvalidTokenError("missing sub")
@@ -139,11 +164,15 @@ def read_me(user: CurrentUser) -> UserOut:
 """
 Common mistakes:
 - Storing plain or fast-hashed (MD5/SHA256) passwords. Use Argon2/bcrypt via pwdlib.
-- `jwt.decode(token, key)` without `algorithms=[...]` - lets attackers pick the algorithm.
+- Trusting the token's own `alg` header. PyJWT 2 refuses `jwt.decode(token, key)` without
+  `algorithms=[...]` (DecodeError), but older libraries/versions accepted whatever the header
+  said (`alg=none`, RS256->HS256 key confusion). Pin exactly ONE algorithm and never mix
+  HS* and RS* in the list.
 - Putting secrets/PII in the JWT payload: it is only base64, not encrypted.
-- Forgetting `exp`: a leaked token then works forever.
+- Forgetting `exp`: a leaked token then works forever. Issue it AND require it when decoding
+  (`options={"require": ["exp", ...]}`): PyJWT only checks `exp` when the claim is present.
 - Different error messages for "no such user" vs "wrong password" (user enumeration).
-- Committing SECRET_KEY, or using one default key across environments.
+- Committing SECRET_KEY, or silently falling back to a default key when it is missing.
 - Sending credentials over plain HTTP.
 
 Production notes:
@@ -159,6 +188,8 @@ Production notes:
 """
 
 if __name__ == "__main__":
+    os.environ.setdefault("APP_ENV", "dev")  # explicit opt-in to the dev key; "prod" is respected
+    print(f"NOTICE: demo running with APP_ENV={os.environ['APP_ENV']} (insecure dev key)")
     client = TestClient(app)
     print(client.get("/users/me").status_code)  # 401: no token
     bad = client.post("/token", data={"username": "ada", "password": "nope"})
