@@ -1,0 +1,53 @@
+# EXAMPLE workflow for the lesson m_11_ci_cd_github_actions. It is not executed by this repo.
+# In a real repository save it as .github/workflows/ci.yml.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Least privilege for the default GITHUB_TOKEN: read the repo, nothing else.
+permissions:
+  contents: read
+
+# A newer push to the same branch cancels the older, now pointless, run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.15"
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --all-groups
+      - name: Lint
+        run: uv run ruff check .
+      - name: Test (reference solutions)
+        run: SOLUTIONS=1 uv run pytest
+
+  deploy:
+    # Only after tests pass, only for pushes to main (never for pull requests).
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production # can require a human approval in repo settings
+    permissions:
+      id-token: write # lets the job request an OIDC token (no stored cloud keys!)
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assume the deploy role via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+      - name: Show who we are (proves short-lived credentials work)
+        run: aws sts get-caller-identity
