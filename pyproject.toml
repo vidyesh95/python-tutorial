@@ -1,0 +1,53 @@
+[project]
+name = "python-tutorial"
+version = "0.1.0"
+description = "Python from basics to advanced, plus FastAPI backend, cloud, applied ML/LLM, robotics infra and forward-deployed engineering tracks."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.8"]
+backend = [
+    "fastapi[standard]>=0.115",
+    "sqlalchemy>=2.0",
+    "alembic>=1.14",
+    "pydantic-settings>=2.6",
+    "pyjwt>=2.10",
+    "redis>=5.2",
+    "httpx>=0.28",
+]
+cloud = ["boto3>=1.35", "google-cloud-storage>=2.19", "kubernetes>=31.0", "mangum>=0.19"]
+ml = [
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "scikit-learn>=1.5",
+    "anthropic>=0.40",
+    "google-genai>=1.0",
+    "ollama>=0.4",
+    "chromadb>=0.5",
+]
+robotics = ["numpy>=2.1", "mcap>=1.2", "onnxruntime>=1.20"]
+fde = ["polars>=1.15", "httpx>=0.28", "streamlit>=1.40"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.pytest.ini_options]
+testpaths = ["t01_fundamentals", "t02_intermediate", "t03_advanced", "t04_fastapi_backend", "t05_cloud_engineering", "t06_applied_ml_llm", "t07_robotics_infra", "t08_forward_deployed"]
+python_files = ["test_*.py"]
+addopts = "--import-mode=importlib -q"
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Lesson demonstrates str()/int()/float() constructors on purpose.
+"t01_fundamentals/m_02_data_types.py" = ["UP018", "E402"]
