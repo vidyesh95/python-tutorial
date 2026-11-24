@@ -8,6 +8,7 @@ dependencies = []
 
 [dependency-groups]
 dev = ["pytest>=8.3", "ruff>=0.8"]
+advanced = ["pydantic>=2.9", "typer>=0.13"]
 backend = [
     "fastapi[standard]>=0.115",
     "sqlalchemy>=2.0",
@@ -16,6 +17,14 @@ backend = [
     "pyjwt>=2.10",
     "redis>=5.2",
     "httpx>=0.28",
+    "aiosqlite>=0.20",
+    "asyncpg>=0.30",
+    "fakeredis>=2.26",
+    "arq>=0.26",
+    "pwdlib[argon2]>=0.2",
+    "opentelemetry-sdk>=1.28",
+    "opentelemetry-instrumentation-fastapi>=0.49b0",
+    "pytest-asyncio>=0.24",
 ]
 cloud = ["boto3>=1.35", "google-cloud-storage>=2.19", "kubernetes>=31.0", "mangum>=0.19"]
 ml = [
@@ -32,13 +41,14 @@ robotics = ["numpy>=2.1", "mcap>=1.2", "onnxruntime>=1.20"]
 fde = ["polars>=1.15", "httpx>=0.28", "streamlit>=1.40"]
 
 [tool.uv]
-default-groups = ["dev"]
+default-groups = ["dev", "advanced"]
 
 [tool.pytest.ini_options]
 testpaths = ["t01_fundamentals", "t02_intermediate", "t03_advanced", "t04_fastapi_backend", "t05_cloud_engineering", "t06_applied_ml_llm", "t07_robotics_infra", "t08_forward_deployed"]
 python_files = ["test_*.py"]
 addopts = "--import-mode=importlib -q"
 pythonpath = ["."]
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
 line-length = 100

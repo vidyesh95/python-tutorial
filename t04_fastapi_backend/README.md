@@ -1,16 +1,14 @@
-# Track 04 — FastAPI Backend
+# Track 04: FastAPI Backend
 
-**Who it's for:** Backend engineers building HTTP APIs and services in Python
+Goal: go from "I can write Python" to "I can design, build, test, ship, and operate a
+production-style HTTP API". By the end you will know FastAPI and Pydantic well, persist data
+with SQLAlchemy 2.0 and Alembic on Postgres, secure an API with OAuth2 + JWT, and add the
+things real services need: background jobs, WebSockets, caching, tests, observability,
+containers, and proper configuration.
 
-## Goals
-
-- Design and validate REST APIs with FastAPI and Pydantic
-- Persist data with SQLAlchemy 2.0 and Alembic on Postgres
-- Secure, test, containerize, and observe a production-style API
-
-## Prerequisite tracks
-
-- t01_fundamentals, t02_intermediate (t03_advanced recommended)
+Prerequisites: `t01_fundamentals` and `t02_intermediate` (decorators, type hints, context
+managers and pytest are used constantly); `t03_advanced` (async, threading) is recommended.
+Python 3.13, managed with `uv`.
 
 ## Setup
 
@@ -18,54 +16,183 @@
 uv sync --group backend
 ```
 
-Note: All lessons use the `backend` dependency group. Run the Postgres and Redis lessons with Docker running.
+Every lesson, exercise, and test runs OFFLINE: no network, no Docker, no real Postgres or
+Redis. Databases use in-memory SQLite and Redis uses `fakeredis`. Docker is only needed if you
+want to try the container and Postgres lessons for real (m_09, m_18) or point a lesson at a
+real Redis (`REDIS_URL=redis://localhost:6379/0`).
 
 ## Lessons
 
-| File | Topic | Status |
-|---|---|---|
-| `m_01_http_rest_basics.py` | HTTP and REST Basics | STUB |
-| `m_02_first_fastapi_app.py` | Your First FastAPI App | STUB |
-| `m_03_path_query_body_params.py` | Path, Query and Body Parameters | STUB |
-| `m_04_pydantic_models_validation.py` | Pydantic Models and Validation | STUB |
-| `m_05_dependency_injection.py` | Dependency Injection with Depends | STUB |
-| `m_06_routers_project_structure.py` | APIRouter and Project Structure | STUB |
-| `m_07_sqlalchemy_2_orm.py` | SQLAlchemy 2.0 ORM | STUB |
-| `m_08_alembic_migrations.py` | Database Migrations with Alembic | STUB |
-| `m_09_postgres_in_docker.py` | PostgreSQL in Docker | STUB |
-| `m_10_auth_oauth2_jwt.py` | OAuth2 Password Flow and JWT | STUB |
-| `m_11_background_tasks.py` | Background Tasks | STUB |
-| `m_12_websockets.py` | WebSockets | STUB |
-| `m_13_middleware_cors.py` | Middleware and CORS | STUB |
-| `m_14_testing_fastapi.py` | Testing FastAPI Apps | STUB |
-| `m_15_redis_caching.py` | Redis Caching | STUB |
-| `m_16_task_queues_arq_celery.py` | Task Queues with arq and Celery | STUB |
-| `m_17_observability_opentelemetry.py` | Observability with OpenTelemetry | STUB |
-| `m_18_dockerizing_fastapi.py` | Dockerizing FastAPI | STUB |
-| `m_19_settings_and_secrets.py` | Settings and Secrets | STUB |
+| #  | Lesson (`m_NN_*.py`)                  | You learn                                                              | Status |
+|----|---------------------------------------|------------------------------------------------------------------------|--------|
+| 01 | `m_01_http_rest_basics`               | HTTP methods, status codes, headers, REST resource design              | ✅ |
+| 02 | `m_02_first_fastapi_app`              | `FastAPI()`, routes, uvicorn, automatic OpenAPI docs                   | ✅ |
+| 03 | `m_03_path_query_body_params`         | path/query/body parameters, validation, `Annotated`                    | ✅ |
+| 04 | `m_04_pydantic_models_validation`     | Pydantic v2 models, validators, response models, serialization         | ✅ |
+| 05 | `m_05_dependency_injection`           | `Depends`, sub-dependencies, `yield` resources, overrides              | ✅ |
+| 06 | `m_06_routers_project_structure`      | `APIRouter`, prefixes, tags, scalable project layout                   | ✅ |
+| 07 | `m_07_sqlalchemy_2_orm`               | declarative models, sessions, relationships, queries, async engine     | ✅ |
+| 08 | `m_08_alembic_migrations`             | revisions, autogenerate, upgrade/downgrade, safe schema changes        | ✅ |
+| 09 | `m_09_postgres_in_docker`             | running Postgres in Docker, connection URLs, pooling                   | ✅ |
+| 10 | `m_10_auth_oauth2_jwt`                | password hashing, OAuth2 password flow, JWT access tokens             | ✅ |
+| 11 | `m_11_background_tasks`               | `BackgroundTasks`, error handling, when to use a real queue            | ✅ |
+| 12 | `m_12_websockets`                     | WebSocket endpoints, connection manager, broadcast, disconnects        | ✅ |
+| 13 | `m_13_middleware_cors`                | request-id/timing middleware, CORS, exception handlers, lifespan       | ✅ |
+| 14 | `m_14_testing_fastapi`                | `TestClient`, `dependency_overrides`, `AsyncClient`, pytest fixtures   | ✅ |
+| 15 | `m_15_redis_caching`                  | cache-aside, TTL, key design, invalidation, rate limiting, fakeredis   | ✅ |
+| 16 | `m_16_task_queues_arq_celery`         | producer/broker/worker, retries, idempotency, arq vs Celery            | ✅ |
+| 17 | `m_17_observability_opentelemetry`    | JSON logs, request ids, traces/spans, metrics, health/readiness        | ✅ |
+| 18 | `m_18_dockerizing_fastapi`            | multi-stage uv Dockerfile, non-root, healthcheck, compose              | ✅ |
+| 19 | `m_19_settings_and_secrets`           | pydantic-settings, `.env`, `SecretStr`, per-environment config         | ✅ |
 
-## Checklist
+Each lesson has a matching exercise `exercises/ex_NN_*.py` (stubs that raise
+`NotImplementedError`), a reference implementation `solutions/ex_NN_*.py`, and tests in
+`tests/test_ex_NN_*.py`. Lessons 18 also ships `docker/Dockerfile` and `docker/compose.yaml`
+(the Postgres lesson adds `docker/compose.postgres.yaml`).
 
-- [ ] m_01: HTTP and REST Basics
-- [ ] m_02: Your First FastAPI App
-- [ ] m_03: Path, Query and Body Parameters
-- [ ] m_04: Pydantic Models and Validation
-- [ ] m_05: Dependency Injection with Depends
-- [ ] m_06: APIRouter and Project Structure
-- [ ] m_07: SQLAlchemy 2.0 ORM
-- [ ] m_08: Database Migrations with Alembic
-- [ ] m_09: PostgreSQL in Docker
-- [ ] m_10: OAuth2 Password Flow and JWT
-- [ ] m_11: Background Tasks
-- [ ] m_12: WebSockets
-- [ ] m_13: Middleware and CORS
-- [ ] m_14: Testing FastAPI Apps
-- [ ] m_15: Redis Caching
-- [ ] m_16: Task Queues with arq and Celery
-- [ ] m_17: Observability with OpenTelemetry
-- [ ] m_18: Dockerizing FastAPI
-- [ ] m_19: Settings and Secrets
+## How to work
 
-## Capstone project
+1. Run the lesson and read the code next to its output. Most lessons expose a module-level
+   `app`, so you can also serve it live (below).
+2. Open the exercise, read the docstrings (they include examples), implement the stubs.
+3. Run the tests for that exercise until they pass.
+4. Only then compare with the solution.
 
-Build a task-management API: a FastAPI service with users, projects, and tasks. Requirements: JWT authentication via the OAuth2 password flow, SQLAlchemy 2.0 models with Alembic migrations targeting Postgres, Redis-cached task listings with invalidation on writes, a background job that flags overdue tasks, and typed settings read from the environment. Ship a pytest suite that overrides the database dependency, a multi-stage Dockerfile, and a compose.yaml that starts the API, Postgres, and Redis together.
+### Run a lesson
+
+```bash
+uv run python -m t04_fastapi_backend.m_11_background_tasks
+```
+
+The `__main__` block exercises the app with `TestClient` and prints the results. It needs no
+server, no input, and no network.
+
+### Serve a lesson live
+
+```bash
+uv run fastapi dev t04_fastapi_backend/m_11_background_tasks.py
+```
+
+Then open http://127.0.0.1:8000/docs (Swagger UI) or http://127.0.0.1:8000/redoc. `fastapi
+dev` auto-reloads on save. Use `uv run fastapi run <file>` for a production-style run.
+
+### Run the tests
+
+```bash
+uv run pytest t04_fastapi_backend                    # all exercises (fail until you implement them)
+uv run pytest t04_fastapi_backend -k background_tasks  # one exercise by keyword
+uv run pytest t04_fastapi_backend -x                 # stop at the first failure
+SOLUTIONS=1 uv run pytest t04_fastapi_backend        # test the reference solutions instead
+```
+
+Before you start, failures are `NotImplementedError`. That is expected.
+
+### Lint and format
+
+```bash
+uv run ruff check t04_fastapi_backend && uv run ruff format t04_fastapi_backend
+```
+
+## Progress checklist
+
+- [ ] 01 HTTP and REST basics: lesson read, exercise passing
+- [ ] 02 First FastAPI app: lesson read, exercise passing
+- [ ] 03 Path, query and body parameters: lesson read, exercise passing
+- [ ] 04 Pydantic models and validation: lesson read, exercise passing
+- [ ] 05 Dependency injection: lesson read, exercise passing
+- [ ] 06 Routers and project structure: lesson read, exercise passing
+- [ ] 07 SQLAlchemy 2.0 ORM: lesson read, exercise passing
+- [ ] 08 Alembic migrations: lesson read, exercise passing
+- [ ] 09 PostgreSQL in Docker: lesson read, exercise passing
+- [ ] 10 OAuth2 and JWT auth: lesson read, exercise passing
+- [ ] 11 Background tasks: lesson read, exercise passing
+- [ ] 12 WebSockets: lesson read, exercise passing
+- [ ] 13 Middleware and CORS: lesson read, exercise passing
+- [ ] 14 Testing FastAPI apps: lesson read, exercise passing
+- [ ] 15 Redis caching: lesson read, exercise passing
+- [ ] 16 Task queues (arq and Celery): lesson read, exercise passing
+- [ ] 17 Observability with OpenTelemetry: lesson read, exercise passing
+- [ ] 18 Dockerizing FastAPI: lesson read, exercise passing
+- [ ] 19 Settings and secrets: lesson read, exercise passing
+- [ ] Capstone below finished, tested, and containerized
+- [ ] `uv run ruff check t04_fastapi_backend` is clean
+
+## Capstone project: task-management API
+
+Build `taskboard`, a multi-user task-management API. Put it in its own folder (for example
+`capstone_t04/`) so the lesson files stay untouched. Treat it as a service you would be happy
+to deploy.
+
+### Requirements
+
+1. **Users and auth**: register and log in; passwords hashed with `pwdlib` (argon2); OAuth2
+   password flow issuing short-lived JWT access tokens; a `get_current_user` dependency;
+   every project/task route requires a valid token. Users can only see their own data.
+2. **Projects and tasks (CRUD)**: a user owns many projects; a project has many tasks with
+   `title`, `description`, `status` (`todo`/`doing`/`done`), `due_date`, `priority`. Full
+   create/read/update/delete with correct status codes (201, 204, 404, 409, 422).
+3. **Persistence**: SQLAlchemy 2.0 typed models (`Mapped`, `mapped_column`), an async session
+   dependency, Alembic migrations (initial schema plus at least one follow-up migration),
+   Postgres in Docker for development and in-memory SQLite for tests.
+4. **Pagination and filtering**: `GET /projects/{id}/tasks?status=&priority=&due_before=&q=&limit=&offset=`
+   with a stable sort, a `limit` cap, and a response that includes `total`, `limit`, `offset`.
+5. **Redis caching**: cache task listings (cache-aside, TTL with jitter, versioned keys that
+   include the user id and the query); invalidate on every write; fall back to the database
+   if Redis is down. Report cache hit/miss in a response header (e.g. `X-Cache`).
+6. **Background notifications**: when a task is assigned or its due date passes, send a
+   notification (write to an outbox table or log). Use `BackgroundTasks` for the quick path
+   and an arq (or in-process, idempotent, retrying) worker for the overdue-task sweep.
+7. **Configuration**: all settings via `pydantic-settings` (`TASKBOARD_` prefix, `SecretStr`
+   for secrets, validation that rejects insecure production config); no secrets in git.
+8. **Cross-cutting**: request-id middleware, CORS from settings, consistent JSON error
+   bodies, a lifespan that opens/closes the DB engine and Redis, `/healthz` and `/readyz`.
+9. **Observability**: structured JSON logs carrying the request id; OpenTelemetry tracing with
+   `FastAPIInstrumentor` and custom spans around DB and cache calls (console or OTLP exporter
+   chosen by env var).
+10. **Tests**: pytest suite using `TestClient`/`AsyncClient`, `dependency_overrides` for the DB
+    session, current user, and `fakeredis`; coverage of at least 80% (`pytest --cov
+    --cov-fail-under=80`), including auth failures, validation errors, pagination edges,
+    cache hit/invalidation, and the notification worker.
+11. **Containers**: a multi-stage `Dockerfile` (uv, non-root, healthcheck, `.dockerignore`) and
+    a `compose.yaml` that starts the API, Postgres, and Redis with healthchecks and
+    `depends_on: condition: service_healthy`; migrations run as a separate one-off step.
+
+### Suggested layout
+
+```
+capstone_t04/
+├── pyproject.toml
+├── alembic.ini
+├── alembic/
+│   ├── env.py
+│   └── versions/
+├── Dockerfile
+├── .dockerignore
+├── compose.yaml
+├── .env.example
+├── src/taskboard/
+│   ├── main.py            # create_app(), lifespan, middleware, routers
+│   ├── config.py          # Settings, get_settings
+│   ├── db.py              # engine, async_sessionmaker, get_session
+│   ├── models.py          # User, Project, Task (SQLAlchemy 2.0)
+│   ├── schemas.py         # Pydantic request/response models
+│   ├── security.py        # hashing, JWT create/verify, get_current_user
+│   ├── cache.py           # Redis client, keys, get_or_set, invalidation
+│   ├── tasks.py           # background jobs, arq WorkerSettings
+│   ├── observability.py   # JSON logging, OTel setup
+│   └── routers/
+│       ├── auth.py        # /auth/register, /auth/token
+│       ├── projects.py
+│       └── tasks.py
+└── tests/
+    ├── conftest.py        # engine/session, client, fakeredis, auth fixtures
+    ├── test_auth.py
+    ├── test_projects.py
+    ├── test_tasks.py
+    ├── test_cache.py
+    └── test_worker.py
+```
+
+Stretch: WebSocket endpoint pushing live task updates to project members; rate limiting with
+Redis; Postgres full-text search on tasks; deploy the compose stack to a small VM or a
+managed container service.

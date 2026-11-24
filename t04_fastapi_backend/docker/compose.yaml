@@ -1,0 +1,55 @@
+# API + Postgres + Redis for local development.
+#   docker compose -f t04_fastapi_backend/docker/compose.yaml up --build
+#   docker compose -f t04_fastapi_backend/docker/compose.yaml down -v   # also drop volumes
+# Values come from your shell or a .env file next to this file; the defaults are DEV ONLY.
+name: fastapi-lesson
+
+services:
+  api:
+    build:
+      context: ../..                      # repository root
+      dockerfile: t04_fastapi_backend/docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: dev
+      # The lesson API itself does not open these connections; your capstone app will
+      # (it also needs a Postgres driver such as asyncpg in its dependencies).
+      DATABASE_URL: postgresql+asyncpg://app:${POSTGRES_PASSWORD:-dev-password}@postgres:5432/app
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy        # wait for the healthcheck, not just "started"
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-password}
+      POSTGRES_DB: app
+    ports:
+      - "127.0.0.1:5432:5432"             # bound to localhost only
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # data survives container re-creation
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
