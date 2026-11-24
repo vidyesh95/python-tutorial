@@ -103,7 +103,7 @@ print("restored:", get_mode())
 def test_slugify_shape() -> None:
     value = "  Python 3.15  "  # arrange
     result = slugify(value)  # act
-    assert result == "python-3-13"  # assert
+    assert result == "python-3-15"  # assert
 
 
 test_slugify_shape()  # a test is just a function; pytest finds and calls it for you
