@@ -39,13 +39,13 @@ class Money:
         """Consistent with __eq__ so Money works in sets and as dict keys."""
         return hash((self.cents, self.currency))
 
-    def __lt__(self, other: "Money") -> bool:
+    def __lt__(self, other: Money) -> bool:
         """Compare cents. Raise ValueError if the currencies differ."""
         if self.currency != other.currency:
             raise ValueError("currency mismatch")
         return self.cents < other.cents
 
-    def __add__(self, other: "Money") -> "Money":
+    def __add__(self, other: Money) -> Money:
         """Return a new Money with summed cents. Raise ValueError if currencies differ."""
         if self.currency != other.currency:
             raise ValueError("currency mismatch")
@@ -62,7 +62,7 @@ class Playlist:
         """Number of songs."""
         return len(self._songs)
 
-    def __getitem__(self, index: int | slice) -> "str | Playlist":
+    def __getitem__(self, index: int | slice) -> str | Playlist:
         """playlist[0] gives a title; playlist[1:3] gives a new Playlist."""
         if isinstance(index, slice):
             return Playlist(self._songs[index])
@@ -72,7 +72,7 @@ class Playlist:
         """Iterate over the titles."""
         return iter(self._songs)
 
-    def __add__(self, other: "Playlist") -> "Playlist":
+    def __add__(self, other: Playlist) -> Playlist:
         """Concatenate two playlists into a new one."""
         return Playlist(self._songs + other._songs)
 

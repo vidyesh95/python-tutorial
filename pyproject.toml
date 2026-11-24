@@ -3,7 +3,7 @@ name = "python-tutorial"
 version = "0.1.0"
 description = "Python from basics to advanced, plus FastAPI backend, cloud, applied ML/LLM, robotics infra and forward-deployed engineering tracks."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.15"
 dependencies = []
 
 [dependency-groups]
@@ -26,7 +26,13 @@ backend = [
     "opentelemetry-instrumentation-fastapi>=0.49b0",
     "pytest-asyncio>=0.24",
 ]
-cloud = ["boto3>=1.35", "google-cloud-storage>=2.19", "kubernetes>=31.0", "mangum>=0.19"]
+cloud = [
+    "boto3>=1.35",
+    "moto[s3,dynamodb,sqs,sns,awslambda]>=5.0",
+    "google-cloud-storage>=2.19",
+    "kubernetes>=31.0",
+    "mangum>=0.19",
+]
 ml = [
     "numpy>=2.1",
     "pandas>=2.2",
@@ -35,9 +41,11 @@ ml = [
     "anthropic>=0.40",
     "google-genai>=1.0",
     "ollama>=0.4",
-    "chromadb>=0.5",
+    "sqlite-vec>=0.1.6",
+    "mcp>=1.2",
 ]
-robotics = ["numpy>=2.1", "mcap>=1.2", "onnxruntime>=1.20"]
+ml-torch = ["torch>=2.6", "transformers>=4.48", "peft>=0.14", "accelerate>=1.2"]
+robotics = ["numpy>=2.1", "mcap>=1.2"]
 fde = ["polars>=1.15", "httpx>=0.28", "streamlit>=1.40"]
 
 [tool.uv]
@@ -52,7 +60,7 @@ asyncio_default_fixture_loop_scope = "function"
 
 [tool.ruff]
 line-length = 100
-target-version = "py313"
+target-version = "py315"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

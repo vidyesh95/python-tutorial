@@ -59,7 +59,7 @@ class CountedAccess:
 
 
 class Command:
-    registry: dict[str, type["Command"]] = {}
+    registry: dict[str, type[Command]] = {}
 
     def __init_subclass__(cls, /, name: str | None = None, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)

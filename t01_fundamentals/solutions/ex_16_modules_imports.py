@@ -68,7 +68,7 @@ def python_at_least(major: int, minor: int = 0) -> bool:
 
     Examples:
         python_at_least(3) -> True
-        python_at_least(3, 13) -> True on Python 3.13+
+        python_at_least(3, 15) -> True on Python 3.15+
         python_at_least(99) -> False
     """
     return sys.version_info[:2] >= (major, minor)

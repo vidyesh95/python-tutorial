@@ -8,7 +8,7 @@ containers, and proper configuration.
 
 Prerequisites: `t01_fundamentals` and `t02_intermediate` (decorators, type hints, context
 managers and pytest are used constantly); `t03_advanced` (async, threading) is recommended.
-Python 3.13, managed with `uv`.
+Python 3.15, managed with `uv`.
 
 ## Setup
 

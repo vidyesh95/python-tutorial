@@ -25,7 +25,7 @@ class Timer:
     Exceptions inside the block must propagate (do not suppress them).
     """
 
-    def __enter__(self) -> "Timer":
+    def __enter__(self) -> Timer:
         self.elapsed = 0.0
         self._start = time.perf_counter()
         return self

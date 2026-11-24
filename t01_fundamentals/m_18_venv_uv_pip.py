@@ -15,7 +15,7 @@ THE CLASSIC WAY (venv + pip)
 
 THE MODERN WAY (uv: one fast tool for Python versions, venvs, dependencies and running code)
     uv init my-project                   scaffold a project with pyproject.toml
-    uv python install 3.13               install/manage Python versions
+    uv python install 3.15               install/manage Python versions
     uv add requests                      add a dependency (updates pyproject.toml + uv.lock)
     uv add --dev pytest ruff             add a dev-only dependency
     uv remove requests                   remove a dependency
@@ -30,7 +30,7 @@ pyproject.toml is the project's single configuration file. A minimal one:
     [project]
     name = "my-project"
     version = "0.1.0"
-    requires-python = ">=3.13"
+    requires-python = ">=3.15"
     dependencies = ["requests>=2.32"]
 
     [dependency-groups]

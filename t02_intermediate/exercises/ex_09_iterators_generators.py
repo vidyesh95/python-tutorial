@@ -38,7 +38,7 @@ class Fibonacci:
     def __init__(self, count: int) -> None:
         raise NotImplementedError
 
-    def __iter__(self) -> "Fibonacci":
+    def __iter__(self) -> Fibonacci:
         """An iterator returns itself."""
         raise NotImplementedError
 

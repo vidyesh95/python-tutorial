@@ -17,7 +17,7 @@ from types import TracebackType
 
 # Example: class-based context manager
 class Timer:
-    def __enter__(self) -> "Timer":
+    def __enter__(self) -> Timer:
         self.start = time.perf_counter()
         return self
 

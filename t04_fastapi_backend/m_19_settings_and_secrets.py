@@ -87,7 +87,7 @@ class Settings(BaseSettings):
         return value
 
     @model_validator(mode="after")
-    def check_production(self) -> "Settings":
+    def check_production(self) -> Settings:
         if self.env == "prod":
             if self.debug:
                 raise ValueError("debug must be off in prod")

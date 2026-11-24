@@ -42,7 +42,7 @@ class Project(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100), unique=True)
-    tasks: Mapped[list["Task"]] = relationship(back_populates="project")
+    tasks: Mapped[list[Task]] = relationship(back_populates="project")
 
 
 class Task(Base):

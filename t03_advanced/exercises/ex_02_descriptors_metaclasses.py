@@ -75,7 +75,7 @@ class Command:
     Implement __init_subclass__.
     """
 
-    registry: dict[str, type["Command"]] = {}
+    registry: dict[str, type[Command]] = {}
 
     def __init_subclass__(cls, /, name: str | None = None, **kwargs: Any) -> None:
         raise NotImplementedError

@@ -24,8 +24,8 @@ print(list(filter(lambda n: n % 2 == 0, nums)))
 # The comprehension equivalents
 print([n * 10 for n in nums], [n for n in nums if n % 2 == 0])
 
-# map with several iterables
-print(list(map(lambda a, b: a + b, [1, 2, 3], [10, 20, 30])))
+# map with several iterables; strict=True (3.14+) raises if lengths differ, like zip(strict=True)
+print(list(map(lambda a, b: a + b, [1, 2, 3], [10, 20, 30], strict=True)))
 
 # Example: sorted with key
 people = [

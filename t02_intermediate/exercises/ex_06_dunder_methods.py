@@ -36,11 +36,11 @@ class Money:
         """Consistent with __eq__ so Money works in sets and as dict keys."""
         raise NotImplementedError
 
-    def __lt__(self, other: "Money") -> bool:
+    def __lt__(self, other: Money) -> bool:
         """Compare cents. Raise ValueError if the currencies differ."""
         raise NotImplementedError
 
-    def __add__(self, other: "Money") -> "Money":
+    def __add__(self, other: Money) -> Money:
         """Return a new Money with summed cents. Raise ValueError if currencies differ."""
         raise NotImplementedError
 
@@ -55,7 +55,7 @@ class Playlist:
         """Number of songs."""
         raise NotImplementedError
 
-    def __getitem__(self, index: int | slice) -> "str | Playlist":
+    def __getitem__(self, index: int | slice) -> str | Playlist:
         """playlist[0] gives a title; playlist[1:3] gives a new Playlist."""
         raise NotImplementedError
 
@@ -63,7 +63,7 @@ class Playlist:
         """Iterate over the titles."""
         raise NotImplementedError
 
-    def __add__(self, other: "Playlist") -> "Playlist":
+    def __add__(self, other: Playlist) -> Playlist:
         """Concatenate two playlists into a new one."""
         raise NotImplementedError
 

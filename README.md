@@ -35,7 +35,7 @@ Everyone does **t01 → t02 → t03** first. Then:
 
 ## Setup
 
-Requires [uv](https://docs.astral.sh/uv/). Python 3.13 is pinned in `.python-version`; uv installs it automatically.
+Requires [uv](https://docs.astral.sh/uv/). Python 3.15 is pinned in `.python-version`; uv installs it automatically.
 
 ```bash
 uv sync                      # dev tools (pytest, ruff) + pydantic/typer (t03)

@@ -101,7 +101,7 @@ print("restored:", get_mode())
 
 # Example: the arrange / act / assert shape of a good test
 def test_slugify_shape() -> None:
-    value = "  Python 3.13  "  # arrange
+    value = "  Python 3.15  "  # arrange
     result = slugify(value)  # act
     assert result == "python-3-13"  # assert
 

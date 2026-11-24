@@ -32,7 +32,7 @@ class Vector:
             return NotImplemented  # let Python try the reflected operation
         return self._data == other._data
 
-    def __lt__(self, other: "Vector") -> bool:
+    def __lt__(self, other: Vector) -> bool:
         return abs(self) < abs(other)
 
     def __hash__(self) -> int:  # must agree with __eq__
@@ -50,10 +50,10 @@ class Vector:
     def __getitem__(self, index: int | slice) -> float | tuple[float, ...]:
         return self._data[index]
 
-    def __add__(self, other: "Vector") -> "Vector":
+    def __add__(self, other: Vector) -> Vector:
         return Vector(*(a + b for a, b in zip(self, other, strict=True)))
 
-    def __mul__(self, scalar: float) -> "Vector":
+    def __mul__(self, scalar: float) -> Vector:
         return Vector(*(c * scalar for c in self))
 
     __rmul__ = __mul__  # makes 3 * v work too

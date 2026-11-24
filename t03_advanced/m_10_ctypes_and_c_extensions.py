@@ -37,7 +37,7 @@ def load_libc() -> ctypes.CDLL | None:
     for candidate in candidates:
         try:
             return ctypes.CDLL(candidate)
-        except (OSError, TypeError):
+        except OSError, TypeError:
             continue
     return None
 
@@ -58,7 +58,7 @@ if libm_name:
         libm.sqrt.argtypes = [ctypes.c_double]
         libm.sqrt.restype = ctypes.c_double
         print("libm sqrt(2.0):", round(libm.sqrt(2.0), 6))
-    except (OSError, AttributeError):
+    except OSError, AttributeError:
         print("libm could not be loaded; skipping")
 else:
     print("libm not found; skipping")

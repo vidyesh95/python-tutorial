@@ -7,7 +7,7 @@ managers), the patterns frameworks like FastAPI are built on (decorators, type h
 the everyday engineering skills around them (logging, testing, packaging, pathlib/json/csv,
 datetimes, regex).
 
-Prerequisite: `t01_fundamentals`. Python 3.13, managed with `uv`. Only the standard library
+Prerequisite: `t01_fundamentals`. Python 3.15, managed with `uv`. Only the standard library
 and pytest are needed.
 
 ## Lessons

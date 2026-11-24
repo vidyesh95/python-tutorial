@@ -55,8 +55,9 @@ def test_broadcast_reaches_everyone_and_drops_dead_sockets():
 
 def test_chat_endpoint_two_clients():
     manager = ex.ConnectionManager()
-    client = TestClient(ex.create_app(manager))
-    with client.websocket_connect("/ws/ada") as ada:
+    # `with TestClient(...)` runs every connection on ONE shared event loop. Without it each
+    # websocket_connect gets its own loop thread and cross-socket broadcasts race.
+    with TestClient(ex.create_app(manager)) as client, client.websocket_connect("/ws/ada") as ada:
         assert ada.receive_text() == "* ada joined"
         with client.websocket_connect("/ws/bob") as bob:
             assert ada.receive_text() == "* bob joined"

@@ -25,7 +25,7 @@ class OrderStatus(StrEnum):
         """True for DELIVERED and CANCELLED."""
         raise NotImplementedError
 
-    def can_transition_to(self, new: "OrderStatus") -> bool:
+    def can_transition_to(self, new: OrderStatus) -> bool:
         """Allowed moves: PENDING -> SHIPPED or CANCELLED, SHIPPED -> DELIVERED. Nothing else."""
         raise NotImplementedError
 

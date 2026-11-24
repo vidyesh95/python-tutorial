@@ -46,7 +46,7 @@ def test_zero_copy_window_shares_memory():
 def _libc_available() -> bool:
     try:
         ctypes.CDLL(ctypes.util.find_library("c"))["strlen"]
-    except (OSError, TypeError, AttributeError, KeyError):
+    except OSError, TypeError, AttributeError, KeyError:
         return False
     return True
 

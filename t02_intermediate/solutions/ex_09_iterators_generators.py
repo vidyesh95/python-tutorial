@@ -47,7 +47,7 @@ class Fibonacci:
         self._produced = 0
         self._a, self._b = 0, 1
 
-    def __iter__(self) -> "Fibonacci":
+    def __iter__(self) -> Fibonacci:
         """An iterator returns itself."""
         return self
 

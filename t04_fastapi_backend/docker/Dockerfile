@@ -3,7 +3,7 @@
 #   docker build -f t04_fastapi_backend/docker/Dockerfile -t fastapi-lesson .
 
 # ---- Stage 1: builder (has uv and build tools; discarded afterwards) ----
-FROM python:3.13-slim AS builder
+FROM python:3.15-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.13.9 /uv /uvx /bin/
 
 ENV UV_COMPILE_BYTECODE=1 \
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project --no-default-groups --group backend
 
 # ---- Stage 2: runtime (small, no uv, no compilers) ----
-FROM python:3.13-slim AS runtime
+FROM python:3.15-slim AS runtime
 
 # Unprivileged user: a compromised process cannot write to the image or run as root.
 RUN groupadd --system --gid 1001 app \

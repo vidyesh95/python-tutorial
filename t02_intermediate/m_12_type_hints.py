@@ -52,7 +52,7 @@ class Box[T]:
     def __init__(self, item: T) -> None:
         self.item = item
 
-    def map[U](self, func: Callable[[T], U]) -> "Box[U]":
+    def map[U](self, func: Callable[[T], U]) -> Box[U]:
         return Box(func(self.item))
 
 

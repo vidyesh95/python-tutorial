@@ -128,7 +128,7 @@ print("metaclass registry:", sorted(RegistryMeta.registry))
 
 # Example: the same job with __init_subclass__ (usually the better tool)
 class Plugin:
-    registry: dict[str, type["Plugin"]] = {}
+    registry: dict[str, type[Plugin]] = {}
 
     def __init_subclass__(cls, /, key: str | None = None, **kwargs: Any) -> None:
         super().__init_subclass__(**kwargs)

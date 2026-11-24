@@ -53,7 +53,7 @@ class UserCreate(UserBase):  # what clients SEND
         return v
 
     @model_validator(mode="after")
-    def passwords_match(self) -> "UserCreate":  # model validator: across fields
+    def passwords_match(self) -> UserCreate:  # model validator: across fields
         if self.password != self.password_confirm:
             raise ValueError("passwords do not match")
         return self

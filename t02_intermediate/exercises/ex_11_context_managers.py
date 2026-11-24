@@ -23,7 +23,7 @@ class Timer:
     Exceptions inside the block must propagate (do not suppress them).
     """
 
-    def __enter__(self) -> "Timer":
+    def __enter__(self) -> Timer:
         raise NotImplementedError
 
     def __exit__(

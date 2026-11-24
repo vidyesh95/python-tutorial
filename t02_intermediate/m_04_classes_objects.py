@@ -44,7 +44,7 @@ class Account:
 
     # Example: classmethod as alternative constructor
     @classmethod
-    def from_string(cls, text: str) -> "Account":
+    def from_string(cls, text: str) -> Account:
         owner, balance = text.split(":")
         return cls(owner, float(balance))
 
@@ -89,7 +89,7 @@ class Point:
         self.x = x
         self.y = y
 
-    def distance_to(self, other: "Point") -> float:
+    def distance_to(self, other: Point) -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
 
     def __repr__(self) -> str:

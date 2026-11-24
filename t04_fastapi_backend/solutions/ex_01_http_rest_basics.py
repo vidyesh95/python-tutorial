@@ -68,7 +68,7 @@ def fetch_json(client: httpx.Client, path: str) -> object:
     if response.status_code >= 400:
         try:
             detail = response.json()["detail"]
-        except (ValueError, KeyError, TypeError):
+        except ValueError, KeyError, TypeError:
             detail = response.text
         raise ApiError(response.status_code, str(detail))
     return response.json()

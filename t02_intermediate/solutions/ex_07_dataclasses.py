@@ -25,7 +25,7 @@ class Product:
         if self.price < 0:
             raise ValueError("price must be >= 0")
 
-    def with_discount(self, percent: float) -> "Product":
+    def with_discount(self, percent: float) -> Product:
         """Return a NEW Product with price reduced by percent (copy tags too).
 
         >>> Product("pen", 10.0).with_discount(25).price
@@ -42,7 +42,7 @@ class Version:
     minor: int = 0
     patch: int = 0
 
-    def bump_minor(self) -> "Version":
+    def bump_minor(self) -> Version:
         """Return a new Version with minor + 1 and patch reset to 0 (use dataclasses.replace).
 
         >>> Version(1, 2, 3).bump_minor()

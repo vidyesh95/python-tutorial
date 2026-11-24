@@ -33,7 +33,7 @@ see DOCKERIGNORE below. Without it `COPY .` would ship `.git`, `.venv`, `.env`, 
 
 Common mistakes
 - Baking secrets into the image (`ENV API_KEY=...`, copying `.env`). Inject at runtime.
-- `FROM python:latest` or no tag: builds change under you. Pin the minor version (3.13-slim)
+- `FROM python:latest` or no tag: builds change under you. Pin the minor version (3.15-slim)
   or even a digest.
 - Running as root; copying the whole repo before installing dependencies (no cache).
 - Binding to `127.0.0.1` inside the container: unreachable from outside. Use `0.0.0.0`.

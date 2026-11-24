@@ -48,7 +48,7 @@ class DateRange(BaseModel):
     end: date
 
     @model_validator(mode="after")
-    def check_order(self) -> "DateRange":
+    def check_order(self) -> DateRange:
         """Raise ValueError('end must not be before start') when end < start; return self."""
         raise NotImplementedError
 

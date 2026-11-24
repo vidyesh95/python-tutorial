@@ -34,7 +34,7 @@ def safe_int(text: str, default: int | None = None) -> int | None:
     """
     try:
         return int(text)
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return default
 
 

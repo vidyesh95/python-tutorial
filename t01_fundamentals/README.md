@@ -4,7 +4,7 @@
 
 By the end of this track you can:
 
-- read and write idiomatic Python 3.13 (variables, types, operators, control flow);
+- read and write idiomatic Python 3.15 (variables, types, operators, control flow);
 - work with the core data structures: strings, lists, tuples, dicts and sets;
 - write, document and test small functions, understand scope and closures;
 - handle errors with exceptions, split code into modules, and read/write files;

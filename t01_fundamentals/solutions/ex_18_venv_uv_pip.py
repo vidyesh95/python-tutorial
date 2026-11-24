@@ -14,10 +14,10 @@ import tomllib
 
 
 def python_version_string() -> str:
-    """Return the running Python version like ``"3.13.1"``.
+    """Return the running Python version like ``"3.15.2"``.
 
     Examples:
-        python_version_string() -> "3.13.1"
+        python_version_string() -> "3.15.2"
     """
     v = sys.version_info
     return f"{v.major}.{v.minor}.{v.micro}"

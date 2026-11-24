@@ -31,7 +31,7 @@ class BankAccount:
         raise NotImplementedError
 
     @classmethod
-    def from_string(cls, text: str) -> "BankAccount":
+    def from_string(cls, text: str) -> BankAccount:
         """Build from 'owner:balance'.
 
         >>> BankAccount.from_string("ada:100.5").balance

@@ -15,9 +15,9 @@ threads do not run in parallel. It does NOT make your own compound operations at
 
 concurrent.futures gives one API for both: ThreadPoolExecutor and ProcessPoolExecutor.
 
-Free-threaded CPython 3.13t (built with --disable-gil, install with `uv python install
-3.13t`) removes the GIL (PEP 703, experimental in 3.13). Threads then run Python code in
-parallel, but you must lock shared state yourself, and some C extensions may re-enable
+Free-threaded CPython (the "t" builds, e.g. `uv python install 3.15t`) removes the GIL
+(PEP 703). It was experimental in 3.13 and became officially supported in 3.14 (PEP 779),
+though the default build still has the GIL. Threads then run Python code in parallel, but you must lock shared state yourself, and some C extensions may re-enable
 the GIL (override with the PYTHON_GIL=0/1 environment variable).
 """
 

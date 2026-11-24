@@ -6,7 +6,7 @@ descriptors), pick the right concurrency model (threads, processes, asyncio) and
 result, validate data with Pydantic, ship a CLI with Typer, recognise the design patterns that
 show up in real backend, ML and robotics codebases, and know how Python talks to C.
 
-Prerequisites: `t01_fundamentals` and `t02_intermediate`. Python 3.13, managed with `uv`.
+Prerequisites: `t01_fundamentals` and `t02_intermediate`. Python 3.15, managed with `uv`.
 Only the standard library, pytest, pydantic v2 and typer are needed (all installed by
 `uv sync`).
 
@@ -17,7 +17,7 @@ Only the standard library, pytest, pydantic v2 and typer are needed (all install
 | 01 | `m_01_protocols_abcs_generics`   | `Protocol`, `ABC`, PEP 695 generics, `runtime_checkable`                   |
 | 02 | `m_02_descriptors_metaclasses`   | `__get__/__set__/__set_name__`, `type()`, metaclasses, `__init_subclass__` |
 | 03 | `m_03_functools_itertools`       | `cache`, `partial`, `singledispatch`, `reduce`, itertools recipes          |
-| 04 | `m_04_threading_multiprocessing_gil` | the GIL, threads for I/O, process pools for CPU, locks, queues, free-threaded 3.13t |
+| 04 | `m_04_threading_multiprocessing_gil` | the GIL, threads for I/O, process pools for CPU, locks, queues, free-threaded 3.15t |
 | 05 | `m_05_asyncio_deep_dive`         | event loop, tasks, `TaskGroup`, timeouts, semaphores, queues, cancellation |
 | 06 | `m_06_profiling_performance`     | `timeit`, `cProfile`, `tracemalloc`, `__slots__`, algorithmic wins         |
 | 07 | `m_07_pydantic_v2`               | `BaseModel`, `Field`, validators, `computed_field`, `TypeAdapter`          |
@@ -115,4 +115,4 @@ Requirements
    limiting (never exceeds N per second) and cancellation.
 
 Stretch: add a `ProcessPoolExecutor` stage that parses large HTML bodies for links, and
-compare with a thread pool on a GIL build versus `python3.13t`.
+compare with a thread pool on a GIL build versus `python3.15t`.

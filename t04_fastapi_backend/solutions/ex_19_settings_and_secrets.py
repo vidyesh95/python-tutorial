@@ -43,7 +43,7 @@ class Settings(BaseSettings):
         return value
 
     @model_validator(mode="after")
-    def check_production(self) -> "Settings":
+    def check_production(self) -> Settings:
         """When env == "prod": raise ValueError if debug is on, or if the secret key still
         equals DEFAULT_KEY. Return self otherwise (non-prod environments are not checked).
         """

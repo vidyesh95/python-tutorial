@@ -25,7 +25,9 @@ for raw in ["42", "abc", None]:
         print("bad value:", err)
     except TypeError as err:
         print("bad type:", err)
-    except (KeyError, IndexError):  # one handler for several types
+    # One handler for several types. Python 3.14+ (PEP 758) lets you drop the parentheses
+    # when there is no `as name`; older code writes `except (KeyError, IndexError):`.
+    except KeyError, IndexError:
         print("never reached here")
 
 
@@ -123,7 +125,7 @@ except BankError as err:  # catches InsufficientFunds too
 # Context managers clean up for you
 # Example
 class Noisy:
-    def __enter__(self) -> "Noisy":
+    def __enter__(self) -> Noisy:
         print("enter")
         return self
 

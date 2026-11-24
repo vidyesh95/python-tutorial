@@ -79,7 +79,7 @@ class Booking(BaseModel):
         return v.strip().title()
 
     @model_validator(mode="after")
-    def dates_in_order(self) -> "Booking":
+    def dates_in_order(self) -> Booking:
         if self.check_out <= self.check_in:
             raise ValueError("check_out must be after check_in")
         return self

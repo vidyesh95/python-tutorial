@@ -37,7 +37,7 @@ name = "log-analyzer"
 version = "0.3.1"
 description = "Summarize application log files."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.15"
 license = { text = "MIT" }
 authors = [{ name = "Ada Lovelace", email = "ada@example.com" }]
 dependencies = [

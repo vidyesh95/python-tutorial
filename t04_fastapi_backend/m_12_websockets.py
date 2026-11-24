@@ -101,25 +101,25 @@ def index() -> dict[str, int]:
 
 
 if __name__ == "__main__":
-    client = TestClient(app)
+    # `with` = one shared event loop for all connections (avoids cross-loop races)
+    with TestClient(app) as client:
+        # Two clients in one chat room
+        with client.websocket_connect("/ws/ada") as ada:
+            print("ada sees:", ada.receive_text())
+            with client.websocket_connect("/ws/bob") as bob:
+                print("ada sees:", ada.receive_text())  # bob's join is broadcast
+                print("bob sees:", bob.receive_text())
+                ada.send_text("hello bob")
+                print("bob sees:", bob.receive_text())
+                print("ada sees:", ada.receive_text())  # sender gets the broadcast too
+            print("ada sees:", ada.receive_text())  # bob left (disconnect handled)
 
-    # Two clients in one chat room
-    with client.websocket_connect("/ws/ada") as ada:
-        print("ada sees:", ada.receive_text())
-        with client.websocket_connect("/ws/bob") as bob:
-            print("ada sees:", ada.receive_text())  # bob's join is broadcast
-            print("bob sees:", bob.receive_text())
-            ada.send_text("hello bob")
-            print("bob sees:", bob.receive_text())
-            print("ada sees:", ada.receive_text())  # sender gets the broadcast too
-        print("ada sees:", ada.receive_text())  # bob left (disconnect handled)
-
-    # JSON endpoint, with and without the token
-    with client.websocket_connect("/ws-json?token=secret") as ws:
-        ws.send_json({"b": 1, "a": 2})
-        print(ws.receive_json())
-    try:
-        with client.websocket_connect("/ws-json?token=wrong"):
-            pass
-    except WebSocketDisconnect as exc:
-        print("rejected with close code", exc.code)
+        # JSON endpoint, with and without the token
+        with client.websocket_connect("/ws-json?token=secret") as ws:
+            ws.send_json({"b": 1, "a": 2})
+            print(ws.receive_json())
+        try:
+            with client.websocket_connect("/ws-json?token=wrong"):
+                pass
+        except WebSocketDisconnect as exc:
+            print("rejected with close code", exc.code)
