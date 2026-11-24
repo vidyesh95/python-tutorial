@@ -1,21 +1,221 @@
 # Recording Data with rosbag2 and MCAP
 """
-Status: STUB — full lesson coming in a later pass.
+Robots generate more data than you can stream live, so you RECORD it and analyze it later:
+replay a failure, train a model, regression-test a planner. MCAP is the open container
+format for that; ROS 2 Jazzy's rosbag2 uses it as the default storage (`ros2 bag record -s
+mcap`). Foxglove, Rerun and plain Python can all read it.
 
-What you will learn:
-- MCAP file structure: channels, schemas, and messages
-- Writing and reading MCAP with the Python library
-- Indexing and seeking by timestamp
-- Converting rosbag2 recordings
+File layout (MCAP is append-only, so a crash loses little)
+- Header: profile + library string.
+- SCHEMA records: a name, an encoding (`ros2msg`, `jsonschema`, `protobuf`, ...) and the
+  definition bytes. Readers use it to decode without your source code.
+- CHANNEL records: topic + message encoding (`cdr`, `json`) + a schema id. One topic = one
+  channel (a topic could carry several channels with different encodings).
+- MESSAGE records: channel id, `log_time` (when recorded), `publish_time` (when sent), payload.
+  Messages are grouped in CHUNKS (optionally zstd/lz4 compressed), each with a message index.
+- Summary section at the end: statistics (counts, start/end), channel and schema tables, and
+  the chunk index. A reader can answer "what is in this file?" and seek to a time window
+  WITHOUT scanning the whole file. A file with no summary (unfinished) still reads, slowly.
+- Attachments (calibration files, maps) and metadata (key/value: robot id, git SHA).
 
-Key concepts / APIs:
-- e.g. `mcap.writer.Writer`, `mcap.reader`, `ros2 bag record`
+rosbag2 vs plain MCAP: a rosbag2 "bag" is a DIRECTORY with `metadata.yaml` plus storage
+files; with the mcap plugin the storage file is a normal `.mcap` (so everything below works
+on it). The older default storage was sqlite3 (`.db3`): one row per message, no chunk
+compression, no summary index; convert it with `ros2 bag convert` or the `rosbags` package.
 
-Prerequisites: all earlier lessons in this track (through m_06_time_series_storage)
-Install: uv sync --group robotics
-Further reading: https://mcap.dev/
+Why not CSV/JSON lines? Binary types, many topics in one time-ordered file, schema carried
+with the data, random access by time, and compression.
+
+Common mistakes
+- Forgetting `writer.finish()` (use the context-manager pattern) so no summary/index is written.
+- Using `publish_time` for ordering; replay and queries use `log_time`.
+- Registering a schema per message instead of once; reusing a channel id from another file.
+- Mixing time bases: log_time here is nanoseconds since the Unix epoch, not seconds.
+- Loading a multi-GB file fully into memory instead of streaming with `iter_messages`.
+
+Production notes
+- Rotate/split files (size or time) so each is a self-contained, uploadable unit; write to
+  `*.mcap.part` and rename when closed, so uploaders never see a half-written file.
+- Put robot id, software version and calibration hash in metadata for later forensics.
+- Record only what you need: sensor topics at full rate are huge. Compress with zstd.
+- Never trust a recording blindly: check the summary for expected topics, message counts
+  and gaps (a dropped LiDAR topic is easy to miss) before using it for training.
+- Recorded data may contain faces, plates or locations: apply your retention/privacy policy.
 """
 
-# TODO: Example 1 — minimal working example of Recording Data with rosbag2 and MCAP
-# TODO: Example 2 — realistic usage of Recording Data with rosbag2 and MCAP with error handling
-# TODO: Exercise — small script that applies Recording Data with rosbag2 and MCAP to a real task
+import json
+import random
+import tempfile
+from collections.abc import Iterator
+from pathlib import Path
+
+from mcap.reader import make_reader
+from mcap.writer import CompressionType, Writer
+from rosbags.rosbag2 import StoragePlugin
+from rosbags.rosbag2 import Writer as BagWriter
+from rosbags.typesys import Stores, get_typestore
+
+NS = 1_000_000_000
+TELEMETRY_SCHEMA = {
+    "type": "object",
+    "properties": {"battery_v": {"type": "number"}, "temp_c": {"type": "number"}},
+    "required": ["battery_v", "temp_c"],
+}
+
+
+# Example 1: a JSON-schema channel (easiest to inspect; fine for low-rate telemetry)
+def write_telemetry(path: Path, n: int = 20, hz: int = 10, seed: int = 7) -> None:
+    rng = random.Random(seed)
+    with open(path, "wb") as f:
+        writer = Writer(f, compression=CompressionType.ZSTD)
+        writer.start(profile="", library="t07-lesson")
+        schema_id = writer.register_schema(
+            name="Telemetry", encoding="jsonschema", data=json.dumps(TELEMETRY_SCHEMA).encode()
+        )
+        channel_id = writer.register_channel(
+            topic="/robot/telemetry", message_encoding="json", schema_id=schema_id
+        )
+        for i in range(n):
+            t = i * NS // hz
+            sample = {"battery_v": round(24.0 - 0.01 * i, 3), "temp_c": 40 + rng.random()}
+            writer.add_message(
+                channel_id, log_time=t, publish_time=t, data=json.dumps(sample).encode()
+            )
+        writer.add_metadata("run", {"robot_id": "r-42", "git_sha": "abc1234"})
+        writer.finish()  # writes chunk indexes + summary: do not skip this
+
+
+# Example 2: ROS 2 CDR messages. Schema = the .msg text (generated by rosbags), encoding ros2msg
+def write_imu(path: Path, n: int = 50, hz: int = 100, seed: int = 3) -> None:
+    ts = get_typestore(Stores.ROS2_JAZZY)
+    imu = ts.types["sensor_msgs/msg/Imu"]
+    import numpy as np
+
+    rng = random.Random(seed)
+    msgdef, _ = ts.generate_msgdef(imu.__msgtype__)
+    with open(path, "wb") as f:
+        writer = Writer(f)
+        writer.start(profile="ros2", library="t07-lesson")
+        schema_id = writer.register_schema(
+            name=imu.__msgtype__, encoding="ros2msg", data=msgdef.encode()
+        )
+        channel_id = writer.register_channel(
+            topic="/imu/data", message_encoding="cdr", schema_id=schema_id
+        )
+        for i in range(n):
+            t = i * NS // hz
+            msg = imu(
+                header=ts.types["std_msgs/msg/Header"](
+                    stamp=ts.types["builtin_interfaces/msg/Time"](sec=t // NS, nanosec=t % NS),
+                    frame_id="imu_link",
+                ),
+                orientation=ts.types["geometry_msgs/msg/Quaternion"](x=0.0, y=0.0, z=0.0, w=1.0),
+                orientation_covariance=np.zeros(9),
+                angular_velocity=ts.types["geometry_msgs/msg/Vector3"](x=0.0, y=0.0, z=0.0),
+                angular_velocity_covariance=np.zeros(9),
+                linear_acceleration=ts.types["geometry_msgs/msg/Vector3"](
+                    x=0.0, y=0.0, z=9.81 + rng.gauss(0, 0.02)
+                ),
+                linear_acceleration_covariance=np.zeros(9),
+            )
+            writer.add_message(
+                channel_id,
+                log_time=t,
+                publish_time=t,
+                data=bytes(ts.serialize_cdr(msg, imu.__msgtype__)),
+            )
+        writer.finish()
+
+
+def read_imu_z(path: Path) -> list[float]:
+    ts = get_typestore(Stores.ROS2_JAZZY)
+    with open(path, "rb") as f:
+        reader = make_reader(f)
+        return [
+            ts.deserialize_cdr(message.data, schema.name).linear_acceleration.z
+            for schema, _channel, message in reader.iter_messages(topics=["/imu/data"])
+        ]
+
+
+# Example 3: summary (no scan) and time-range queries (uses the chunk index to seek)
+def describe(path: Path) -> dict[str, object]:
+    with open(path, "rb") as f:
+        summary = make_reader(f).get_summary()
+    assert summary is not None and summary.statistics is not None, "file has no summary"
+    stats = summary.statistics
+    return {
+        "messages": stats.message_count,
+        "start_s": stats.message_start_time / NS,
+        "end_s": stats.message_end_time / NS,
+        "topics": {
+            summary.channels[cid].topic: count
+            for cid, count in stats.channel_message_counts.items()
+        },
+        "schemas": sorted(s.name for s in summary.schemas.values()),
+    }
+
+
+def window(path: Path, topic: str, start_ns: int, end_ns: int) -> Iterator[tuple[int, bytes]]:
+    """Messages with start_ns <= log_time < end_ns, ordered by log_time."""
+    with open(path, "rb") as f:
+        reader = make_reader(f)
+        for _schema, _channel, message in reader.iter_messages(
+            topics=[topic], starting_at=start_ns, ending_before=end_ns
+        ):
+            yield message.log_time, message.data
+
+
+# Example 4: rosbag2 with the MCAP storage plugin is just MCAP + metadata.yaml
+def write_rosbag2_mcap(bag_dir: Path) -> Path:
+    ts = get_typestore(Stores.ROS2_JAZZY)
+    string = ts.types["std_msgs/msg/String"]
+    with BagWriter(
+        bag_dir, version=9, storage_plugin=StoragePlugin.MCAP
+    ) as bag:  # bag_dir must not exist
+        conn = bag.add_connection("/chat", "std_msgs/msg/String", typestore=ts)
+        for i in range(3):
+            bag.write(
+                conn, i * NS, bytes(ts.serialize_cdr(string(data=f"hello {i}"), conn.msgtype))
+            )
+    return next(bag_dir.glob("*.mcap"))
+
+
+def run_demo() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+
+        write_telemetry(root / "telemetry.mcap")
+        print("telemetry summary:", describe(root / "telemetry.mcap"))
+        rows = [
+            json.loads(data)
+            for _, data in window(root / "telemetry.mcap", "/robot/telemetry", 0, 3 * NS // 10)
+        ]
+        print("first 0.3 s:", [row["battery_v"] for row in rows])
+
+        write_imu(root / "imu.mcap")
+        info = describe(root / "imu.mcap")
+        print("imu summary:", info["topics"], info["schemas"])
+        z = read_imu_z(root / "imu.mcap")
+        print(f"imu z mean {sum(z) / len(z):.3f} over {len(z)} samples")
+        mid = [t for t, _ in window(root / "imu.mcap", "/imu/data", 200_000_000, 250_000_000)]
+        print("imu log_times in [0.20, 0.25) s:", mid)
+
+        for compression in (CompressionType.NONE, CompressionType.ZSTD):
+            path = root / f"big_{compression.name.lower()}.mcap"
+            with open(path, "wb") as f:
+                w = Writer(f, compression=compression)
+                w.start()
+                sid = w.register_schema(name="Blob", encoding="jsonschema", data=b"{}")
+                cid = w.register_channel(topic="/blob", message_encoding="json", schema_id=sid)
+                for i in range(200):
+                    w.add_message(cid, log_time=i, publish_time=i, data=b'{"v": 1.0}' * 20)
+                w.finish()
+            print(f"{path.name}: {path.stat().st_size} bytes")
+
+        mcap_file = write_rosbag2_mcap(root / "bag")
+        print("rosbag2 dir:", sorted(p.name for p in (root / "bag").iterdir()))
+        print("rosbag2 storage read by plain mcap:", describe(mcap_file)["topics"])
+
+
+if __name__ == "__main__":
+    run_demo()

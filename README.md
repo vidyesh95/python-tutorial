@@ -18,8 +18,8 @@ A hands-on curriculum to learn Python from zero to advanced, then apply it as a:
 | 04 | [`t04_fastapi_backend`](t04_fastapi_backend/README.md) | ✅ Written | REST, FastAPI, DI, SQLAlchemy 2 + Alembic, auth/JWT, WebSockets, Redis, queues, OTel, Docker |
 | 05 | [`t05_cloud_engineering`](t05_cloud_engineering/README.md) | ✅ Written | boto3, Lambda, DynamoDB, SQS, GCP SDK, CDK/Pulumi, Kubernetes, CI/CD, serverless FastAPI |
 | 06 | [`t06_applied_ml_llm`](t06_applied_ml_llm/README.md) | ✅ Written | numpy/pandas/sklearn/PyTorch, Claude & Gemini SDKs, HF/Ollama/vLLM, embeddings, RAG, agents/MCP, evals, LoRA |
-| 07 | [`t07_robotics_infra`](t07_robotics_infra/README.md) | 🚧 Stubs | Binary protocols, serial/CAN, ROS 2 rclpy, telemetry pipelines, MCAP, simulation, ONNX on device |
-| 08 | [`t08_forward_deployed`](t08_forward_deployed/README.md) | 🚧 Stubs | Customer API integration, ETL, OAuth/webhooks, Streamlit/Gradio, LLM integration, prod debugging |
+| 07 | [`t07_robotics_infra`](t07_robotics_infra/README.md) | ✅ Written | Binary protocols, serial/CAN, ROS 2 rclpy, telemetry pipelines, MCAP, simulation, ONNX on device |
+| 08 | [`t08_forward_deployed`](t08_forward_deployed/README.md) | ✅ Written | Customer API integration, ETL, OAuth/webhooks, Streamlit/Gradio, LLM integration, prod debugging |
 
 ## Role-based paths
 
@@ -46,8 +46,8 @@ uv sync --group backend      # FastAPI stack (t04)
 uv sync --group cloud        # boto3 + moto (offline AWS mocks), GCP, k8s (t05)
 uv sync --group ml           # numpy, pandas, sklearn, anthropic, google-genai, ollama, sqlite-vec, mcp (t06)
 uv sync --group ml-torch     # torch, transformers, peft (t06 PyTorch / HF / LoRA lessons; large download)
-uv sync --group robotics     # mcap (t07)
-uv sync --group fde          # polars, streamlit (t08)
+uv sync --group robotics     # mcap, rosbags, pyserial, python-can, onnx, mujoco (t07)
+uv sync --group fde          # polars, duckdb, respx, tenacity, authlib, streamlit, gradio (t08)
 ```
 
 ## How to study
