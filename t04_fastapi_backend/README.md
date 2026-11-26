@@ -31,7 +31,7 @@ real Redis (`REDIS_URL=redis://localhost:6379/0`).
 | 04 | `m_04_pydantic_models_validation`     | Pydantic v2 models, validators, response models, serialization         | ✅ |
 | 05 | `m_05_dependency_injection`           | `Depends`, sub-dependencies, `yield` resources, overrides              | ✅ |
 | 06 | `m_06_routers_project_structure`      | `APIRouter`, prefixes, tags, scalable project layout                   | ✅ |
-| 07 | `m_07_sqlalchemy_2_orm`               | declarative models, sessions, relationships, queries, async engine     | ✅ |
+| 07 | `m_07_sqlalchemy_2_orm`               | declarative models, sessions, relationships, queries (sync engine)    | ✅ |
 | 08 | `m_08_alembic_migrations`             | revisions, autogenerate, upgrade/downgrade, safe schema changes        | ✅ |
 | 09 | `m_09_postgres_in_docker`             | running Postgres in Docker, connection URLs, pooling                   | ✅ |
 | 10 | `m_10_auth_oauth2_jwt`                | password hashing, OAuth2 password flow, JWT access tokens             | ✅ |
@@ -45,6 +45,11 @@ real Redis (`REDIS_URL=redis://localhost:6379/0`).
 | 18 | `m_18_dockerizing_fastapi`            | multi-stage uv Dockerfile, non-root, healthcheck, compose              | ✅ |
 | 19 | `m_19_settings_and_secrets`           | pydantic-settings, `.env`, `SecretStr`, per-environment config         | ✅ |
 | 20 | `m_20_auth_schema_sessions`           | Better Auth-style schema, DB sessions, JWT refresh rotation, OAuth link | ✅ |
+| 21 | `m_21_sqlmodel_crud`                  | SQLModel table + data models, `SessionDep`, CRUD, partial updates      | ✅ |
+| 22 | `m_22_streaming_jsonl_sse`            | Stream JSON Lines, Server-Sent Events (`fastapi.sse`), resume          | ✅ |
+| 23 | `m_23_dependency_scope`               | `Depends(scope=...)`: when `yield` dependency cleanup runs             | ✅ |
+| 24 | `m_24_request_limits_strict_content_type` | request body/form limits, strict JSON content type                 | ✅ |
+| 25 | `m_25_fastapi_cli_and_cloud`          | `fastapi dev`/`run`, entrypoint discovery, FastAPI Cloud deploy        | ✅ |
 
 Each lesson has a matching exercise `exercises/ex_NN_*.py` (stubs that raise
 `NotImplementedError`), a reference implementation `solutions/ex_NN_*.py`, and tests in
@@ -116,6 +121,11 @@ uv run ruff check t04_fastapi_backend && uv run ruff format t04_fastapi_backend
 - [ ] 18 Dockerizing FastAPI: lesson read, exercise passing
 - [ ] 19 Settings and secrets: lesson read, exercise passing
 - [ ] 20 Auth schema, sessions and token rotation: lesson read, exercise passing
+- [ ] 21 SQLModel CRUD: lesson read, exercise passing
+- [ ] 22 Streaming JSON Lines and SSE: lesson read, exercise passing
+- [ ] 23 Dependency scope: lesson read, exercise passing
+- [ ] 24 Request limits and strict content type: lesson read, exercise passing
+- [ ] 25 FastAPI CLI and FastAPI Cloud: lesson read, exercise passing
 - [ ] Capstone below finished, tested, and containerized
 - [ ] `uv run ruff check t04_fastapi_backend` is clean
 

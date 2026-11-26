@@ -46,6 +46,7 @@ Production notes
 - Set CPU/memory limits; stay under them (workers x memory per worker).
 - Behind a proxy/load balancer run uvicorn with `--proxy-headers` and `--forwarded-allow-ips`.
 - Log to stdout/stderr only; the platform collects it (see m_17).
+- Alternative to self-managed containers: FastAPI Cloud (`fastapi deploy`), see m_25.
 """
 
 import re

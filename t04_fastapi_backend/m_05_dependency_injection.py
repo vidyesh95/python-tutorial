@@ -12,6 +12,7 @@ Kinds of dependency:
 - CLASS: `Depends(Pagination)` - FastAPI calls the class; its `__init__` params are inputs.
 - YIELD (generator): code before `yield` = setup, the yielded value is injected, code after
   `yield` (in `finally`) = cleanup that runs after the response. Perfect for DB sessions.
+  See m_23 for `Depends(scope=...)` (when cleanup runs).
 - SUB-DEPENDENCY: a dependency can itself depend on others; FastAPI resolves the graph.
 - Non-value dependencies: `@app.get(..., dependencies=[Depends(check_key)])` runs for its
   side effect (auth check) and ignores the return value.
